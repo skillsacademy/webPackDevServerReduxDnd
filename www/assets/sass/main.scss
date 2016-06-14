@@ -4,3 +4,27 @@ body{
 	
 	color:red;
 }
+.wrapper{
+	position:relative;
+	width:300px;
+	border:1px solid #040;
+	padding:10px;
+}
+.dropArea{
+	width:100%;
+	border:1px solid #00f;
+	padding:20px;
+	display:inline-block;
+}
+.dragTarget{
+	/*position:absolute;*/
+	display:inline-block;
+	top:0;
+	left:0;
+	width:200px;
+	border:1px solid #090;
+	z-index:2;
+	background:#f92;
+	opacity:0.3;
+	cursor:pointer;
+}

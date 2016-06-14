@@ -1,9 +1,6 @@
-"# vanillaWebPackDevServerSass" 
+"# vanillaWebPackDevServerSassReduxDnd" 
 
 # README #
-
-( example from - https://www.sitepoint.com/how-to-build-a-todo-app-using-react-redux-and-immutable-js/)
-
 
 1) after downloading this file
 
