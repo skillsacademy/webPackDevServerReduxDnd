@@ -8,6 +8,7 @@ import DropArea from './dropArea.jsx';
 import DragTarget from './dragTarget.jsx';
 
 
+
 class AppDragContainer extends React.Component {
   render () {
     return (     
@@ -20,6 +21,9 @@ class AppDragContainer extends React.Component {
   }
 }
 
+function wrapDragContext(child) {
+	return DragDropContext(HTML5Backend)(child);
+}
 
 
-export default DragDropContext(HTML5Backend)(AppDragContainer);
+export default wrapDragContext(AppDragContainer);

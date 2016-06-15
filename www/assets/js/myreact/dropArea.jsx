@@ -4,23 +4,6 @@ import {render} from 'react-dom';
 import HTML5Backend from 'react-dnd-html5-backend';
 import {DropTarget} from 'react-dnd';
 
-const spec = {
-	drop(){
-		return {
-			name: 'DropArea'
-		};
-	}
-}
-
-
-let collect = (connect, monitor) => {
-	return {
-		connectDropTarget: connect.dropTarget(),
-		isOver: monitor.isOver(),
-		canDrop: monitor.canDrop()
-	}
-};
-
 class AppDropArea extends React.Component {
   render () {
   	const { canDrop, isOver, connectDropTarget} = this.props;
@@ -41,20 +24,36 @@ class AppDropArea extends React.Component {
     	connectDropTarget( 
 		    <div className="dropArea" style={style}>
 		    	{
-		    		isActive? 'dropped': 'open'
+		    		isActive? 'dropped': 'being draggopen'
 		    	}
 	        </div>  
         )      
     );
   }
 }
-
 AppDropArea.propTypes = {
 	connectDropTarget:PropTypes.func.isRequired,
 	isOver: PropTypes.bool.isRequired,
 	canDrop: PropTypes.bool.isRequired
 }
 
+function wrapDropTarget(child, dragTargetName) {
+	const spec = {
+		drop(){
+			return {
+				name: 'DropArea'
+			};
+		}
+	}
+	const collect = (connect, monitor) => {
+		return {
+			connectDropTarget: connect.dropTarget(),
+			isOver: monitor.isOver(),
+			canDrop: monitor.canDrop()
+		}
+	};	
+	return DropTarget(dragTargetName,spec, collect)(child);
+}
 
 
-export default DropTarget('dropTargetX',spec, collect)(AppDropArea);
+export default wrapDropTarget(AppDropArea, 'dragTargetX');
