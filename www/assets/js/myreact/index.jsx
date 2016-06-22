@@ -7,6 +7,6 @@ if (module.hot){
 
 import React from 'react';
 import {render} from 'react-dom';
-import AppDragContainer from './dragContainer.jsx';
+import WrapDragContainer from './dragContainer.jsx';
 
-render(<AppDragContainer pagename="first component" />, document.getElementById('app'));
+render(<WrapDragContainer dragItemName="dragItemX" />, document.getElementById('app'));

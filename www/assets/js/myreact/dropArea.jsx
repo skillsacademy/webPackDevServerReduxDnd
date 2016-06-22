@@ -1,6 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import {render} from 'react-dom';
-
 import HTML5Backend from 'react-dnd-html5-backend';
 import {DropTarget} from 'react-dnd';
 
@@ -31,6 +29,7 @@ class AppDropArea extends React.Component {
     );
   }
 }
+
 AppDropArea.propTypes = {
 	connectDropTarget:PropTypes.func.isRequired,
 	isOver: PropTypes.bool.isRequired,
