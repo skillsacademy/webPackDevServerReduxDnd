@@ -18,15 +18,10 @@ class AppDragTarget extends Component{
 
 	_onDragStart /* function */(event){	
 
-		// only left mouse button
-		//if (event.button !== 0){
-	//		return
-//		}
-
-
 		var elemOffset = ReactDOM.findDOMNode(event.target).getBoundingClientRect();
 		var startEvtX = event.pageX || event.targetTouches[0].pageX;
 		var startEvtY = event.pageY || event.targetTouches[0].pageY;
+
 
 		return this.setState({
 			mousedown: true,
@@ -37,8 +32,24 @@ class AppDragTarget extends Component{
 		})
 
 	}	
-	_onDragEnd (event){	
-		event.preventDefault();		 // needed to prevent normal device scrolling during drag
+	_onDragEnd (event){		
+
+		var x = event.pageX || event.changedTouches[0].pageX;
+		var y = event.pageY || event.changedTouches[0].pageY;
+		
+
+		this.setState({
+			dropped:true			
+		}, function(){
+			console.log('dropped into? ',document.elementFromPoint(x,y));
+
+			this.setState({
+				dropped:false			
+			});
+
+		});
+
+
 		return this.setState({
 			dragging: false
 		});
@@ -48,6 +59,9 @@ class AppDragTarget extends Component{
 	_onDragMove (event){	
 		event.preventDefault(); // needed to prevent normal device scrolling during drag
 
+		if(!event.pageX && !event.targetTouches){
+			return;
+		}
 		var base, base1, deltaX, deltaY, distance;
 		var evtX = event.pageX || event.targetTouches[0].pageX;
 		var evtY = event.pageY || event.targetTouches[0].pageY;
@@ -76,29 +90,34 @@ class AppDragTarget extends Component{
 			});
 		}
 
-
-
 	}
+
 	
 	render /*function*/ () {    
 		var style = {};
 		if (this.state.dragging && this.state.left) {
+			var strTranslate = 'translate(' + this.state.left + 'px,' + this.state.top + 'px)';
 			style = {
 				position: 'absolute',
-				left: this.state.left + 'px',
-				top: this.state.top + 'px'
+				transform: strTranslate
+			};
+		}else if(this.state.dropped){
+			// temporary hide, so we can capture the drop state
+			style = {
+				display:'none'
 			};
 		}
 
 
 
 		return (
-			<div className='dragTarget' 
+			<div id="dragMe" className='dragTarget' 
 
 				style={style} 
 				draggable="true"
-				onMouseDown={this._onDragStart.bind(this)}
+				onDragStart={this._onDragStart.bind(this)}
 				onTouchStart={this._onDragStart.bind(this)}
+
 
 				onTouchMove={this._onDragMove.bind(this)}
 				onDrag={this._onDragMove.bind(this)}
@@ -106,6 +125,8 @@ class AppDragTarget extends Component{
 
 				onDragEnd={this._onDragEnd.bind(this)}
 				onTouchEnd={this._onDragEnd.bind(this)}
+				onTouchCancel={this._onDragEnd.bind(this)}
+
 				 >
 				Drag me somewhere
 			</div>		
