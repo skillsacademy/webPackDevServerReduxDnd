@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import { DragSource } from 'react-dnd';
+
 
 const LEFT_BUTTON = 0;
 const DRAG_THRESHOLD = 3;
@@ -11,8 +11,7 @@ class AppDragTarget extends Component{
 		super(props);	
 
 		this.state = {
-			dragging: false,
-			rel: null // position relative to the cursor
+			dragging: false
 		}
 
 	}
@@ -82,8 +81,6 @@ class AppDragTarget extends Component{
 	}
 	
 	render /*function*/ () {    
-		const { name, connectDragSource, isDragging } = this.props;	
-
 		var style = {};
 		if (this.state.dragging && this.state.left) {
 			style = {
@@ -96,64 +93,25 @@ class AppDragTarget extends Component{
 
 
 		return (
-			connectDragSource(
-				<div className='dragTarget' 
+			<div className='dragTarget' 
 
-					style={style} 
+				style={style} 
 
-					onMouseDown={this._onDragStart.bind(this)}
-					onTouchStart={this._onDragStart.bind(this)}
+				onMouseDown={this._onDragStart.bind(this)}
+				onTouchStart={this._onDragStart.bind(this)}
 
-					onTouchMove={this._onDragMove.bind(this)}
-					onDrag={this._onDragMove.bind(this)}
+				onTouchMove={this._onDragMove.bind(this)}
+				onDrag={this._onDragMove.bind(this)}
 
 
-					onDragEnd={this._onDragEnd.bind(this)}
-					onTouchEnd={this._onDragEnd.bind(this)}
-					 >
-					Drag me somewhere
-				</div>		
-			)
+				onDragEnd={this._onDragEnd.bind(this)}
+				onTouchEnd={this._onDragEnd.bind(this)}
+				 >
+				Drag me somewhere
+			</div>		
+		
     	)
   	} 	
 };
-AppDragTarget.propTypes = {
-	connectDragSource: PropTypes.func.isRequired,
-	isDragging: PropTypes.bool. isRequired,
-	name: PropTypes.string.isRequired
-}
 
-AppDragTarget.defaultProps = {	
-	initialPos:{		
-		x: 0, 
-		y: 0
-	}	
-}
-
-function wrapDragTarget(child, dragTargetName) {
-	let spec = {
-	  beginDrag(props) {
-	    return {
-	    	name:props.name
-	    };
-	  },
-	  endDrag(props, monitor){
-	  	const dragItem = monitor.getItem();
-	  	const dropResult = monitor.getDropResult();
-	  	
-	  	if(dropResult){
-	  		console.log('you dropped ' + dragItem.name + ' into ' + dropResult.name);
-	  	}
-	  }  
-
-	};
-	const collect = (connect, monitor) =>{
-	  return {
-	    connectDragSource: connect.dragSource(),
-	    isDragging: monitor.isDragging()
-	  };
-	}	
-	return DragSource(dragTargetName, spec, collect)(child);
-}
-
-export default wrapDragTarget(AppDragTarget, 'dragTargetX');
+export default AppDragTarget;

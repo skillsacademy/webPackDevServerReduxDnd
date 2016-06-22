@@ -1,6 +1,4 @@
 import React from 'react';
-import HTML5Backend from 'react-dnd-html5-backend';
-import {DragDropContext } from 'react-dnd';
 
 import DropArea from './dropArea.jsx';
 import DragTarget from './dragTarget.jsx';
@@ -19,9 +17,4 @@ class AppDragContainer extends React.Component {
   }
 }
 
-function wrapDragContext(child) {
-	return DragDropContext(HTML5Backend)(child);
-}
-
-
-export default wrapDragContext(AppDragContainer);
+export default AppDragContainer;
