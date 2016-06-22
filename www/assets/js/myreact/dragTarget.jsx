@@ -96,7 +96,7 @@ class AppDragTarget extends Component{
 			<div className='dragTarget' 
 
 				style={style} 
-
+				draggable="true"
 				onMouseDown={this._onDragStart.bind(this)}
 				onTouchStart={this._onDragStart.bind(this)}
 
