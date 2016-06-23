@@ -13,5 +13,5 @@
 5) visit this url inside a browser: 
 http://localhost:3000/default.
 
-6) Try re-saving one of the scss files and watch the page update, without refreshing.
+6) Try dragging the box around the page, and notice the console log, outputting which elements were dropped onto. This is a cross browser and cross device solution, unlikely many online examples.
 
