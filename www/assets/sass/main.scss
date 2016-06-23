@@ -42,6 +42,10 @@ body{
 	&[data-current-state='dragging']{
 		background:red;
 	}
+
+	&[data-current-state='tempDropped']{
+		display:none;
+	}	
 }
 
 

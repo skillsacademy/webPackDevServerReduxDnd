@@ -6,6 +6,91 @@ const LEFT_BUTTON = 0;
 const DRAG_THRESHOLD = 3;
 
 
+function getEvtXY(event){
+	var eventCursor = event;
+	if(event.targetTouches || event.changedTouches){
+		eventCursor = (typeof event.targetTouches.length > 0)?event.targetTouches[0]:event.changedTouches[0];
+	}		
+	return {
+		evtX:eventCursor.pageX,
+		evtY:eventCursor.pageY
+	}	
+}
+
+function getLeftTop(evtXY, startEvtX, startEvtY, elementX, elementY){
+
+	var deltaX, deltaY, distance, left, top
+
+	var evtX = evtXY.evtX;
+	var evtY = evtXY.evtY;
+
+	deltaX = evtX - startEvtX;
+	deltaY = evtY - startEvtY;
+	distance = Math.abs(deltaX) + Math.abs(deltaY);
+
+	if (distance > DRAG_THRESHOLD) {			
+		var left = elementX + deltaX + document.body.scrollLeft;
+		var top = elementY + deltaY + document.body.scrollTop;
+
+		left = (left > 0)?left:0;		
+		top = (top > 0)?top:0;	
+	}
+
+	return {
+		left:left,
+		top:top
+	}
+}
+
+function getDirectionXY(evtXY, startEvtX, startEvtY){
+	return {
+		directionX:(startEvtX > evtXY.evtX)?'left':'right',
+		directionY:(startEvtY > evtXY.evtY)?'top':'bottom'
+	}
+}
+
+function getDropElements(left, top, width, height){
+
+
+	var elemTopLeft = document.elementFromPoint(left,top);
+	var elemTopRight = document.elementFromPoint(left + width,top);
+	var elemBottomRight = document.elementFromPoint(left + width,top + height);
+	var elemBottomLeft = document.elementFromPoint(left, top + height);
+
+
+	var arrDroppedElems = [elemTopLeft];
+
+	if(elemTopRight !== elemTopLeft){
+		arrDroppedElems.push(elemTopRight);
+	}
+	if(elemBottomRight !== elemTopRight && elemBottomRight !== elemTopLeft){
+		arrDroppedElems.push(elemBottomRight);
+	}
+	if(elemBottomLeft !== elemBottomRight && elemBottomLeft !== elemTopRight && elemBottomLeft !== elemTopLeft){
+		arrDroppedElems.push(elemBottomLeft);
+	}
+
+	var arrDroppedElemsAndChildren = [], elemDroppedOnto, nodeListDescendants, arrDescendants;
+	for(var i=0, intLen = arrDroppedElems.length; i < intLen; ++i){
+		elemDroppedOnto = arrDroppedElems[i];
+
+
+		if(elemDroppedOnto && elemDroppedOnto.nodeName !=='HTML'){			
+
+			arrDroppedElemsAndChildren.push(elemDroppedOnto);
+
+			var nodeListDescendants = elemDroppedOnto.querySelectorAll("*");	
+			var arrDescendants = Array.prototype.slice.call(nodeListDescendants);
+
+			arrDroppedElemsAndChildren = arrDroppedElemsAndChildren.concat(arrDescendants);
+		}
+		
+	}
+
+	return arrDroppedElemsAndChildren;	
+}
+
+
 
 class AppDragTarget extends Component{
 
@@ -15,7 +100,7 @@ class AppDragTarget extends Component{
 		this.state = {
 			currentState: 'default',
 			left: null,
-			top: null,			
+			top: null,					
 			useful:{
 				startEvtX:null,
 				startEvtY:null,
@@ -26,43 +111,15 @@ class AppDragTarget extends Component{
 
 	}
 
-	getLeftTop(event){
 
-		var deltaX, deltaY, distance, left, top, eventCursor, evtX, evtY;
-
-		var eventCursor = event;
-		if(event.targetTouches || event.changedTouches){
-			eventCursor = (typeof event.targetTouches.length > 0)?event.targetTouches[0]:event.changedTouches[0];
-		}
-
-		var evtX = eventCursor.pageX;
-		var evtY = eventCursor.pageY;
-
-		deltaX = evtX - this.state.useful.startEvtX;
-		deltaY = evtY - this.state.useful.startEvtY;
-		distance = Math.abs(deltaX) + Math.abs(deltaY);
-
-		if (distance > DRAG_THRESHOLD) {			
-			var left = this.state.useful.elementX + deltaX + document.body.scrollLeft;
-			var top = this.state.useful.elementY + deltaY + document.body.scrollTop;
-		}
-
-		return {
-			left:left,
-			top:top
-		}
-	}
 
 	_onDragStart /* function */(event){	
 
 		var elemOffset = ReactDOM.findDOMNode(event.target).getBoundingClientRect();
 	
-
-		var startEvtX = event.pageX || event.targetTouches[0].pageX;
-		var startEvtY = event.pageY || event.targetTouches[0].pageY;
-
-
-
+		var evtXY = getEvtXY(event);
+		var startEvtX = evtXY.evtX;
+		var startEvtY = evtXY.evtY;
 
 		return this.setState({
 			useful:{			
@@ -74,23 +131,47 @@ class AppDragTarget extends Component{
 		})
 
 	}	
+
+
+
 	_onDragEnd (event){		
 
-		var objLt = this.getLeftTop(event);
+		var evtXY = getEvtXY(event);
+		var startEvtX = this.state.useful.startEvtX;
+		var startEvtY = this.state.useful.startEvtY;
+		var elementX = this.state.useful.elementX;
+		var elementY = this.state.useful.elementY;
+
+		var objLt = getLeftTop(evtXY, startEvtX, startEvtY, elementX, elementY);
 		var left = objLt.left;
 		var top = objLt.top;
 
+		var directionXY = getDirectionXY(evtXY, startEvtX, startEvtY);
+		var element = ReactDOM.findDOMNode(event.target);
 
-		console.log('dropped into? ',document.elementFromPoint(left,top));
+		var width = parseInt(element.offsetWidth, 10);
+		var height = parseInt(element.offsetHeight, 10);
 
-		// now re-show the element...
-		this.setState({
-			currentState:'moved',
-			left:left,
-			top:top			
+
+
+		return this.setState({
+			currentState:'tempDropped'
+
+		}, function(){
+
+			var arrDroppedElems = getDropElements(left, top, width, height);
+
+console.log('arrDroppedElems = ');
+console.dir(arrDroppedElems);			
+
+			// now re-show the element...
+			this.setState({
+				currentState:'moved',
+				left:left,
+				top:top			
+			});
+
 		});
-
-
 	}
 
 	_onDragMove (event){	
@@ -100,7 +181,13 @@ class AppDragTarget extends Component{
 			return;
 		}
 
-		var objLt = this.getLeftTop(event);
+		var evtXY = getEvtXY(event);
+		var startEvtX = this.state.useful.startEvtX;
+		var startEvtY = this.state.useful.startEvtY;
+		var elementX = this.state.useful.elementX;
+		var elementY = this.state.useful.elementY;
+
+		var objLt = getLeftTop(evtXY, startEvtX, startEvtY, elementX, elementY);
 
 		if (objLt.left) {			
 
