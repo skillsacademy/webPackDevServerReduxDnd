@@ -17,7 +17,6 @@ body{
 	display:inline-block;
 }
 .dragTarget{
-	/*position:absolute;*/
 	display:inline-block;
 	top:0;
 	left:0;
@@ -25,9 +24,9 @@ body{
 	border:1px solid #090;
 	z-index:2;
 	background:#f92;
-	opacity:0.3;
+	padding:20px;
 
-	cursor:move;
+	cursor:pointer;
 	
 	-moz-user-select: -moz-none;   
 	-khtml-user-select: none;   
@@ -35,4 +34,14 @@ body{
 	-o-user-select: none;   
 	user-select: none;
 
+	&[data-current-state='dragging'],
+	&[data-current-state='moved']{
+		position:absolute;		
+	}
+
+	&[data-current-state='dragging']{
+		background:red;
+	}
 }
+
+

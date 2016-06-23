@@ -5,9 +5,13 @@ class AppDropArea extends React.Component {
 	constructor /* function */ (props) {
 		super(props);	
 	}
+
+
 	render () {
 		return (    
-			<div className="dropArea" ></div>             
+			<div className="dropArea">
+
+			</div>             
 		);
 	}
 }
